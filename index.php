@@ -3,17 +3,20 @@
 function psr4_autoloader($class){
     // On retire le Rpg\ par défaut
     $prefix = 'Rpg\\';
-    $classPath = str_replace($prefix, '', $class);
 
-    // On remplace les \ par des /
-    $classPath = str_replace('\\', '/', $classPath);
+    if(str_starts_with($class, $pre)){
+        $classPath = str_replace($prefix, '', $class);
+        // On remplace les \ par des /
+        $classPath = str_replace('\\', '/', $classPath);
 
-    // Transformation de la classe en chemin relatif
-    $file = __DIR__ . '/' . $classPath . '.php';
+        // Transformation de la classe en chemin relatif
+        $file = __DIR__ . '/' . $classPath . '.php';
 
-    if(file_exists($file)){
-        require $file;
+        if(file_exists($file)){
+            require $file;
+        }
     }
+    
 }
 
 spl_autoload_register('psr4_autoloader');

@@ -8,7 +8,7 @@
         <input type="text" name="player-name" class="form-control" />
     </div>
 
-    <input type="hidden" name="form" value="name-selector"/>
+    <input type="hidden" name="form" value="qsdfqsdf"/>
 
     <button type="submit" class="btn btn-primary">Créer</button>
 </form>

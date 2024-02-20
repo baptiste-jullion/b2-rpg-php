@@ -58,7 +58,7 @@ class GameEngine {
                 $this->handleCombat($formData);
                 break;
             default:
-                throw new Exception("Formulaire pas géré : " + $formData['form']);
+                throw new \Exception("Formulaire pas géré : " . $formData['form']);
         }
 
         // Redirection sur la page par défaut
