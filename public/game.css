@@ -1,14 +1,33 @@
-.game-logs-container {
-    left: auto;
-    max-height: 25vh;
-    min-height: 200px;
-    width: 30vw;
-    min-width: 300px;
-    overflow-y: scroll;
+*,
+::before,
+::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-decoration: none;
 }
 
-.game-logs-container .list-group {
-    flex-direction: column-reverse;
-    justify-content: end;
-    height: 100%;
+body *::-webkit-scrollbar {
+    display: none;
+}
+
+body * {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+:root {
+    --bg: #13161e;
+    --bg2: #171b26;
+    --border: #40454c;
+    --fg: #e8e8e9;
+}
+
+.btn {
+    width: fit-content;
+    font-size: medium;
+    background-color: var(--bg2) !important;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--border);
 }

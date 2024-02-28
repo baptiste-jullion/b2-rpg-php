@@ -1,34 +1,59 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mon super RPG</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <title>My RPG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
     <link href="public/game.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container mt-3">
-        <h1 class="text-center mb-3">Gab Quest</h1>
 
-        <div class="p-2">
+<body class="bg-[var(--bg)] text-[var(--fg)] font-sans">
+    <div class="container pt-3 mx-auto min-h-[100vh]">
+        <h1 class="text-center text-4xl">My RPG</h1>
+
+        <div>
             <?php $game->run(); ?>
         </div>
 
-        <div class="fixed-bottom end-0 m-3 font-monospace border game-logs-container bg-body-secondary">
-            <ul class="list-group list-group-flush">
-                <?php foreach($game->logs as $log): ?>
-                <li class="list-group-item"><?= $log  ?></li>
+        <div class="fixed bottom-0 right-0 mr-4 rounded-t-xl bg-[var(--bg2)] border border-[var(--border)] w-[600px] aspect-video font-mono overflow-y-scroll translate-y-[270px] hover:translate-y-0 transition-transform" style="mask-image: linear-gradient(to top, transparent 0%, black 20%) ">
+            <ul class="flex flex-col-reverse">
+                <div class="h-[56px]"></div>
+                <?php foreach ($game->logs as $log) : ?>
+                    <hr class="border-[var(--border)]">
+                    <style>
+                        li:last-child {
+                            animation: fadeOut 2s ease-in-out forwards;
+                        }
+
+                        @keyframes fadeOut {
+                            0% {
+                                background-color: transparent;
+                            }
+
+                            10% {
+                                background-color: green;
+                            }
+
+                            100% {
+                                background-color: transparent;
+                            }
+                        }
+                    </style>
+                    <li class="p-4"><?= $log ?></li>
                 <?php endforeach ?>
             </ul>
         </div>
 
         <form method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir reprendre de 0 ?')">
-            <div class="fixed-bottom m-3">
-                <input type="hidden" name="form" value="reset-storage"/>
-                <button type="submit" class="btn btn-info">Reset</button>
+            <div class="fixed bottom-0 m-4 left-0">
+                <input type="hidden" name="form" value="reset-storage" />
+                <button type="submit" class="btn">Reset</button>
             </div>
         </form>
     </div>
 </body>
+
 </html>
