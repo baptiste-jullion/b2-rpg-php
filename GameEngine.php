@@ -4,7 +4,7 @@ namespace Rpg;
 
 use Rpg\Models\Player;
 use Rpg\Models\Characters\Enemy;
-use Rpg\Models\Characters\Enemies\{Harpy, Kobold};
+use Rpg\Models\Characters\Enemies\{Harpy, Kobold, Wraith, Boss};
 
 class GameEngine
 {
@@ -107,7 +107,7 @@ class GameEngine
     private function enemyActionReply(): void
     {
         if (!$this->enemy->isDead()) {
-            $enemyAction = $this->enemy->getAction($this->enemy->getHealthPoints() <= 20 ? "Heal" : "Throw Spell");
+            $enemyAction = $this->enemy->getAction($this->enemy->getHealthPoints() <= $this->enemy->getMaxHealthPoints() ? "Heal" : "Throw Spell");
             $enemyAction->execute($this->player->getHeroCharacter());
             $this->logAction($this->enemy->getName() . " a utilisé " . $enemyAction->getName());
         }
@@ -127,7 +127,7 @@ class GameEngine
                 $this->createEnemy();
             }
             if ($this->enemy->isDead()) {
-//                require "views/enemy-dead.view.php";
+                //                require "views/enemy-dead.view.php";
                 $this->logAction("Round Win : " . $this->player->getName() . " destroyed " . $this->enemy->getName());
                 $this->player->getHeroCharacter()->earnMana(60);
                 $this->player->getHeroCharacter()->resetHP();
@@ -146,6 +146,15 @@ class GameEngine
                 break;
             case 2:
                 $this->enemy = new Harpy();
+                break;
+            case 3:
+                $this->enemy = new Wraith();
+                break;
+            case 4:
+                $this->enemy = new Boss();
+                break;
+            case 5:
+                require("views/enemy-dead.view.php");
                 break;
         }
         $this->storage->save("enemy", $this->enemy);

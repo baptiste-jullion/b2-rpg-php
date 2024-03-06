@@ -1,5 +1,5 @@
 <p>
-    Soyez la bienvenue sur Gab Quest, entrez le nom de votre personnage pour commencer l'aventure.
+    Welcome to the game! Please enter your character name and choose a class.
 </p>
 
 <form method="POST">
