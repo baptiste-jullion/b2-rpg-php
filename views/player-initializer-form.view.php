@@ -13,6 +13,6 @@
             <label for="<?= $key ?>"><?= $hero["label"] ?></label>
         </div>
     <?php endforeach ?>
-    <button type="submit" class="btn">Valider</button>
+    <button type="submit" class="btn">Valid</button>
     <input type="hidden" name="form" value="player-initializer">
 </form>

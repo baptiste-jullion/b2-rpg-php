@@ -9,7 +9,21 @@ abstract class Hero extends Character
     private int $experiencePoints = 0;
     private int $manaPoints = 100;
     private int $level = 1;
-    private string $image = "https://i0.wp.com/nigoun.fr/wp-content/uploads/2022/04/placeholder.png?ssl=1";
+
+    public function resetHP(): void
+    {
+        $this->healthPoints = $this->maxHealthPoints;
+    }
+
+    public function levelUP(): void
+    {
+        $this->level++;
+        $mulpicator = 1.333 + $this->level / 1.4;
+        $this->maxHealthPoints = round($this->maxHealthPoints * $mulpicator);
+        foreach ($this->getActions() as $action) {
+            $action->adaptCostAndValue($mulpicator);
+        }
+    }
 
     public function spendMana(int $amount): void
     {
@@ -38,22 +52,17 @@ abstract class Hero extends Character
         $this->maxHealthPoints = $maxHealthPoints;
     }
 
+    public function getExperiencePoints(): int
+    {
+        return $this->experiencePoints;
+    }
+
     public function setExperiencePoints(int $experiencePoints): void
     {
         $this->experiencePoints = $experiencePoints;
     }
 
-    public function setImage(string $image): void
-    {
-        $this->image = $image;
-    }
-
     //? Getters
-
-    public function getExperiencePoints(): int
-    {
-        return $this->experiencePoints;
-    }
 
     public function getManaPoints(): int
     {
@@ -65,8 +74,4 @@ abstract class Hero extends Character
         return $this->level;
     }
 
-    public function getImage(): string
-    {
-        return $this->image;
-    }
 }

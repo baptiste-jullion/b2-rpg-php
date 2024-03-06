@@ -21,7 +21,6 @@ abstract class Enemy extends Character
         return $this->name;
     }
 
-
     public function getType(): string
     {
         return end(explode("\\", get_called_class()));

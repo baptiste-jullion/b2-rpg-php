@@ -4,14 +4,14 @@ namespace Rpg;
 
 use Rpg\Models\Player;
 use Rpg\Models\Characters\Enemy;
-use Rpg\Models\Characters\Enemies\{Kobold};
+use Rpg\Models\Characters\Enemies\{Harpy, Kobold};
 
 class GameEngine
 {
-    private SessionStorage $storage;
     public ?Player $player;
     public ?Enemy $enemy;
     public array $logs;
+    private SessionStorage $storage;
 
     public function __construct()
     {
@@ -19,6 +19,22 @@ class GameEngine
     }
 
     // Accède à l"objet storage afin d"alimenter les attributs dans notre moteur
+
+    public function run(): void
+    {
+        // Récupération des données
+        $this->retrieveDataFromSession();
+
+        // Traitement des formulaires
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+            $this->handleForm($_POST);
+        } else {
+            $this->render();
+        }
+    }
+
+    // Ajoute un message à la boîte de log en bas à droite
+
     private function retrieveDataFromSession(): void
     {
         $this->logs = $this->storage->get("logs") ?: [];
@@ -26,44 +42,8 @@ class GameEngine
         $this->enemy = $this->storage->get("enemy");
     }
 
-    // Ajoute un message à la boîte de log en bas à droite
-    private function logAction(string $action): void
-    {
-        $message = date("H:i:s") . " : " . $action;
-        $this->logs[] = $message;
-        $this->storage->save("logs", $this->logs);
-    }
-
     // Réinitialise le storage, associé au bouton en bas à droite
-    private function resetStorage(): void
-    {
-        $this->storage->reset();
-    }
 
-    //? Form handlers
-
-    private function handlePlayerInitialization(array $formData): void
-    {
-
-        $this->player = new Player($formData["player-name"], $formData["player-hero-class"]);
-        $this->storage->save("player", $this->player);
-        $this->logAction("Joueur créé : " . $this->player->getName());
-        $this->logAction("Classe choisie : " . $this->player->getHeroClassName());
-    }
-
-    private function handlePlayerAction(array $formData): void
-    {
-        $action = $this->player->getHeroCharacter()->getAction($formData["action"]);
-        $action->execute($this->enemy);
-        $this->storage->save("player", $this->player);
-        $this->storage->save("enemy", $this->enemy);
-        $this->logAction($this->player->getName() . " a utilisé " . $action->getName());
-        $this->enemyActionReply();
-    }
-
-    // Méthode appelée lorsqu"on fait soumet un formulaire,
-    // utilise le champ caché "form" afin de rediriger sur la méthode associée
-    // Une fois la requête traitée, on redirige sur la page par défaut
     private function handleForm(array $formData): void
     {
         switch ($formData["form"]) {
@@ -85,27 +65,55 @@ class GameEngine
         exit;
     }
 
+    //? Form handlers
+
+    private function resetStorage(): void
+    {
+        $this->storage->reset();
+    }
+
+    private function handlePlayerInitialization(array $formData): void
+    {
+
+        $this->player = new Player($formData["player-name"], $formData["player-hero-class"]);
+        $this->storage->save("player", $this->player);
+        $this->logAction("Joueur créé : " . $this->player->getName());
+        $this->logAction("Classe choisie : " . $this->player->getHeroClassName());
+    }
+
+    // Méthode appelée lorsqu"on fait soumet un formulaire,
+    // utilise le champ caché "form" afin de rediriger sur la méthode associée
+    // Une fois la requête traitée, on redirige sur la page par défaut
+
+    private function logAction(string $action): void
+    {
+        $message = date("H:i:s") . " : " . $action;
+        $this->logs[] = $message;
+        $this->storage->save("logs", $this->logs);
+    }
+
     //? Enemy handlers
 
-    private function createEnemy(): void
+    private function handlePlayerAction(array $formData): void
     {
-        $this->enemy = new Kobold();
+        $action = $this->player->getHeroCharacter()->getAction($formData["action"]);
+        $action->execute($this->enemy);
+        $this->logAction($this->player->getName() . " a utilisé " . $action->getName());
+        $this->storage->save("player", $this->player);
         $this->storage->save("enemy", $this->enemy);
+        $this->enemyActionReply();
     }
 
     private function enemyActionReply(): void
     {
-        if ($this->enemy->isDead()) {
-            return;
+        if (!$this->enemy->isDead()) {
+            $enemyAction = $this->enemy->getAction($this->enemy->getHealthPoints() <= 20 ? "Heal" : "Throw Spell");
+            $enemyAction->execute($this->player->getHeroCharacter());
+            $this->logAction($this->enemy->getName() . " a utilisé " . $enemyAction->getName());
         }
-        $enemyAction = $this->enemy->getAction($this->enemy->getHealthPoints() <= 20 ? "Heal" : "Throw Spell");
-        $enemyAction->execute($this->player->getHeroCharacter());
-        $this->logAction($this->enemy->getName() . " a utilisé " . $enemyAction->getName());
         $this->storage->save("player", $this->player);
         $this->storage->save("enemy", $this->enemy);
     }
-
-    //? Rendering
 
     private function render()
     {
@@ -119,24 +127,27 @@ class GameEngine
                 $this->createEnemy();
             }
             if ($this->enemy->isDead()) {
-                require "views/enemy-dead.view.php";
-                $this->logAction("Victory : " . $this->player->getName() . " destroyed " . $this->enemy->getName());
-                return;
+//                require "views/enemy-dead.view.php";
+                $this->logAction("Round Win : " . $this->player->getName() . " destroyed " . $this->enemy->getName());
+                $this->player->getHeroCharacter()->earnMana(60);
+                $this->player->getHeroCharacter()->resetHP();
+                $this->storage->save("player", $this->player);
+                $this->createEnemy();
             }
             require "views/display-current-player.view.php";
         }
     }
 
-    public function run(): void
+    private function createEnemy(): void
     {
-        // Récupération des données
-        $this->retrieveDataFromSession();
-
-        // Traitement des formulaires
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $this->handleForm($_POST);
-        } else {
-            $this->render();
+        switch ($this->player->getHeroCharacter()->getLevel()) {
+            case 1:
+                $this->enemy = new Kobold();
+                break;
+            case 2:
+                $this->enemy = new Harpy();
+                break;
         }
+        $this->storage->save("enemy", $this->enemy);
     }
 }

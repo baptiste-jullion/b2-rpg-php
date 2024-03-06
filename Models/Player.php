@@ -4,30 +4,30 @@ namespace Rpg\Models;
 
 use Rpg\Models\Characters\Heroes\{Warrior, Witcher, Priest};
 
-class Player
+class  Player
 {
-  private $heroCharacter;
+    private $heroCharacter;
 
-  public function __construct(private string $name, private string $heroClassName)
-  {
-    $heroClass = HEROES[$heroClassName]["class"];
-    $this->heroCharacter = new $heroClass();
-  }
+    public function __construct(private string $name, private string $heroClassName)
+    {
+        $heroClass = HEROES[$heroClassName]["class"];
+        $this->heroCharacter = new $heroClass();
+    }
 
-  //? Getters
+    //? Getters
 
-  public function getName(): string
-  {
-    return $this->name;
-  }
+    public function getName(): string
+    {
+        return $this->name;
+    }
 
-  public function getHeroCharacter()
-  {
-    return $this->heroCharacter;
-  }
+    public function getHeroCharacter()
+    {
+        return $this->heroCharacter;
+    }
 
-  public function getHeroClassName(): string
-  {
-    return $this->heroClassName;
-  }
+    public function getHeroClassName(): string
+    {
+        return $this->heroClassName;
+    }
 }
